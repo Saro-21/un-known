@@ -1,0 +1,6 @@
+{
+  "name": "DrifX - Dead-Reckoning & GNSS Fusion Engine",
+  "description": "Adaptive Intelligent Dead-Reckoning & GNSS Fusion (AIDR-X) navigation engine featuring OpenStreetMap live trajectory, IO-VNBD benchmark loader, synthetic blackout injection, and factor graph fusion.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
