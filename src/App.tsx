@@ -65,6 +65,7 @@ import { OfflineIndicator } from './components/OfflineIndicator';
 import { GoogleMapsDeviceTracker } from './components/GoogleMapsDeviceTracker';
 import { GoogleMapsSettingsModal } from './components/GoogleMapsSettingsModal';
 import { JWTSecurityModal } from './components/JWTSecurityModal';
+import { SupabaseAuthDatabaseView } from './components/SupabaseAuthDatabaseView';
 import { GoogleMapsSettings, DEFAULT_GOOGLE_MAPS_SETTINGS } from './types/googleMapsSettings';
 
 function DrifXInnerApp() {
@@ -457,6 +458,11 @@ function DrifXInnerApp() {
             onOpenSettings={() => setIsMapsSettingsOpen(true)}
             onOpenSecurityModal={() => setIsJwtModalOpen(true)}
           />
+        )}
+
+        {/* SUPABASE AUTHENTICATION & DATABASE ENGINE */}
+        {activeTab === 'supabase_hub' && (
+          <SupabaseAuthDatabaseView />
         )}
 
         {/* 2. Phase 1 & 2 Results */}

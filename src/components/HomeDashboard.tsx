@@ -21,6 +21,7 @@ import {
   CheckCircle2,
   Clock,
   MapPin,
+  Database,
 } from 'lucide-react';
 import { useTheme } from '../theme/ThemeContext';
 import { pushNotificationService } from '../services/notificationService';
@@ -181,6 +182,16 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             <MapPin className="w-3.5 h-3.5 text-black" />
             <span>Google Maps &amp; GPS</span>
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-950 animate-pulse" />
+          </button>
+
+          <button
+            onClick={() => navigateTo('supabase_hub')}
+            className="px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-md hover:scale-[1.02] cursor-pointer bg-gradient-to-r from-emerald-500 to-teal-500 text-black border border-emerald-400 font-mono"
+            title="Open Supabase Cloud Database & Auth Engine"
+          >
+            <Database className="w-3.5 h-3.5 text-black" />
+            <span>Supabase DB &amp; Auth</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-950" />
           </button>
 
           <button

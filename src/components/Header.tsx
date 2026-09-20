@@ -17,6 +17,7 @@ import {
   Settings,
   ShieldCheck,
   ShieldAlert,
+  Database,
 } from 'lucide-react';
 import { DRIVES_CATALOG } from '../core/iovnbdLoader';
 import { PWAInstallButton } from './PWAInstallButton';
@@ -27,6 +28,7 @@ import { jwtAuth } from '../core/jwtAuth';
 export type ActiveTab =
   | 'home_architecture'
   | 'google_maps'
+  | 'supabase_hub'
   | 'phase1_2'
   | 'live_nav'
   | 'phone_cli'
@@ -156,6 +158,26 @@ export const Header: React.FC<HeaderProps> = ({
             <MapPin className={`w-3.5 h-3.5 ${activeTab === 'google_maps' ? 'text-black' : 'text-orange-400'}`} />
             <span>Google Maps</span>
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          </button>
+
+          {/* Direct Supabase Database & Auth Hub Tab Button */}
+          <button
+            onClick={() => setActiveTab('supabase_hub')}
+            className={`px-3 py-1.5 rounded-xl border text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-md cursor-pointer ${
+              activeTab === 'supabase_hub'
+                ? 'bg-emerald-500 text-black border-emerald-400 shadow-emerald-500/20'
+                : 'hover:border-emerald-500/50'
+            }`}
+            style={{
+              backgroundColor: activeTab === 'supabase_hub' ? undefined : theme.bgElevated,
+              borderColor: activeTab === 'supabase_hub' ? undefined : theme.borderSubtle,
+              color: activeTab === 'supabase_hub' ? undefined : theme.textPrimary,
+            }}
+            title="Open Supabase Cloud Database & Authentication Hub"
+          >
+            <Database className={`w-3.5 h-3.5 ${activeTab === 'supabase_hub' ? 'text-black' : 'text-emerald-400'}`} />
+            <span>Supabase</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
           </button>
 
           {/* Quick Map Settings Modal Trigger */}

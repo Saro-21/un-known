@@ -255,6 +255,26 @@ class JWTAuthManager {
     await this.switchProfile('FLEET_ADMIN');
   }
 
+  public async loginWithCustomProfile(options: {
+    sub: string;
+    name: string;
+    email: string;
+    role: UserRole;
+    permissions: SecurityPermission[];
+    description?: string;
+  }) {
+    const newToken = await createJWT({
+      sub: options.sub,
+      name: options.name,
+      email: options.email,
+      role: options.role,
+      permissions: options.permissions,
+      expiresInSeconds: 3600 * 8, // 8 hours
+    });
+
+    return await this.setToken(newToken);
+  }
+
   public async switchProfile(role: UserRole) {
     const profile = PRESET_USER_PROFILES[role];
     const newToken = await createJWT({

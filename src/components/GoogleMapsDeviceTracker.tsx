@@ -34,12 +34,14 @@ import {
   Activity,
   CheckCircle2,
   Lock,
+  Database,
 } from 'lucide-react';
 import {
   GoogleMapsSettings,
   MAP_THEME_STYLES,
 } from '../types/googleMapsSettings';
 import { jwtAuth } from '../core/jwtAuth';
+import { supabaseService } from '../services/supabaseClient';
 
 interface DeviceLocationState {
   lat: number;
@@ -159,9 +161,12 @@ export const GoogleMapsDeviceTracker: React.FC<GoogleMapsDeviceTrackerProps> = (
   const [deadReckoningPath, setDeadReckoningPath] = useState<[number, number][]>([]);
   const [simulatedBlackout, setSimulatedBlackout] = useState<boolean>(false);
   const [deadReckoningDriftM, setDeadReckoningDriftM] = useState<number>(0);
+  const [isSupabaseSyncActive, setIsSupabaseSyncActive] = useState<boolean>(false);
+  const [supabaseSyncCount, setSupabaseSyncCount] = useState<number>(0);
 
   // Watch position ID ref
   const watchIdRef = useRef<number | null>(null);
+  const lastSyncTimeRef = useRef<number>(0);
   const trafficLayerRef = useRef<google.maps.TrafficLayer | null>(null);
   const transitLayerRef = useRef<google.maps.TransitLayer | null>(null);
   const bicyclingLayerRef = useRef<google.maps.BicyclingLayer | null>(null);
@@ -258,6 +263,27 @@ export const GoogleMapsDeviceTracker: React.FC<GoogleMapsDeviceTrackerProps> = (
           }
         });
       }
+
+      // Sync to Supabase Cloud Database if active (throttled to every 3s)
+      if (isSupabaseSyncActive && Date.now() - lastSyncTimeRef.current >= 3000) {
+        lastSyncTimeRef.current = Date.now();
+        supabaseService.logTelemetry({
+          drive_id: 'live_device_gps',
+          latitude,
+          longitude,
+          speed_kmh: speed !== null ? Math.round(speed * 3.6) : 0,
+          heading_deg: heading !== null ? Math.round(heading) : (compassHeading || 0),
+          drift_error_m: isTrackingDrifX ? deadReckoningDriftM : 0.3,
+          is_blackout: simulatedBlackout,
+          device_type: 'device_gps',
+          metadata: {
+            accuracy_m: Math.round(accuracy),
+            altitude_m: altitude,
+          },
+        }).then(() => {
+          setSupabaseSyncCount((c) => c + 1);
+        });
+      }
     };
 
     const handleError = (err: GeolocationPositionError) => {
@@ -273,7 +299,7 @@ export const GoogleMapsDeviceTracker: React.FC<GoogleMapsDeviceTrackerProps> = (
 
     // Watch position continuously
     watchIdRef.current = navigator.geolocation.watchPosition(handleSuccess, handleError, geoOptions);
-  }, [settings.enableHighAccuracy, compassHeading, isTrackingDrifX, simulatedBlackout, onOpenSecurityModal]);
+  }, [settings.enableHighAccuracy, compassHeading, isTrackingDrifX, simulatedBlackout, onOpenSecurityModal, isSupabaseSyncActive, deadReckoningDriftM]);
 
   const stopGeolocation = useCallback(() => {
     if (watchIdRef.current !== null) {
@@ -364,6 +390,25 @@ export const GoogleMapsDeviceTracker: React.FC<GoogleMapsDeviceTrackerProps> = (
           >
             <Settings className="w-4 h-4 text-orange-400" />
             <span className="hidden sm:inline">Map Settings</span>
+          </button>
+
+          {/* Supabase Cloud Live Sync Toggle Button */}
+          <button
+            onClick={() => setIsSupabaseSyncActive((prev) => !prev)}
+            className={`px-3 py-2 rounded-xl border text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5 ${
+              isSupabaseSyncActive
+                ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-md shadow-emerald-500/20'
+                : 'bg-[#141820] border-emerald-500/30 text-neutral-400 hover:border-emerald-500/60 hover:text-emerald-300'
+            }`}
+            title="Stream Live GPS Coordinates to Supabase Postgres Table (telemetry_logs)"
+          >
+            <Database className={`w-4 h-4 ${isSupabaseSyncActive ? 'text-emerald-400 animate-pulse' : 'text-neutral-500'}`} />
+            <span className="hidden sm:inline">
+              {isSupabaseSyncActive ? `Supabase Sync (${supabaseSyncCount})` : 'Sync to Supabase'}
+            </span>
+            {isSupabaseSyncActive && (
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            )}
           </button>
 
           {/* JWT Security Modal Trigger */}

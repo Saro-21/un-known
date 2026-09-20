@@ -12,13 +12,14 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { Home, Layers, Navigation, Smartphone, Download, Bell, MapPin } from 'lucide-react';
+import { Home, Layers, Navigation, Smartphone, Download, Bell, MapPin, Database } from 'lucide-react';
 import { useTheme } from '../theme/ThemeContext';
 import { pushNotificationService } from '../services/notificationService';
 
 export type MainNavTab =
   | 'home_architecture'
   | 'google_maps'
+  | 'supabase_hub'
   | 'phase1_2'
   | 'live_nav'
   | 'phone_cli'
@@ -79,6 +80,12 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
       id: 'google_maps',
       label: 'Google Maps & GPS',
       icon: MapPin,
+      badge: null,
+    },
+    {
+      id: 'supabase_hub',
+      label: 'Supabase Cloud Hub',
+      icon: Database,
       badge: null,
     },
     {
