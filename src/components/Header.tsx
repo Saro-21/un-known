@@ -13,14 +13,20 @@ import {
   Sun,
   Moon,
   Bell,
+  MapPin,
+  Settings,
+  ShieldCheck,
+  ShieldAlert,
 } from 'lucide-react';
 import { DRIVES_CATALOG } from '../core/iovnbdLoader';
 import { PWAInstallButton } from './PWAInstallButton';
 import { useTheme } from '../theme/ThemeContext';
 import { pushNotificationService } from '../services/notificationService';
+import { jwtAuth } from '../core/jwtAuth';
 
 export type ActiveTab =
   | 'home_architecture'
+  | 'google_maps'
   | 'phase1_2'
   | 'live_nav'
   | 'phone_cli'
@@ -40,6 +46,8 @@ interface HeaderProps {
   isTunnelActive: boolean;
   onToggleTunnel: () => void;
   currentHz: number;
+  onOpenMapsSettings?: () => void;
+  onOpenJwtModal?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -53,16 +61,34 @@ export const Header: React.FC<HeaderProps> = ({
   isTunnelActive,
   onToggleTunnel,
   currentHz,
+  onOpenMapsSettings,
+  onOpenJwtModal,
 }) => {
   const currentDrive = DRIVES_CATALOG.find((d) => d.id === selectedDriveId) || DRIVES_CATALOG[0];
   const { theme, toggleDarkLight, themeMode } = useTheme();
   const [unreadCount, setUnreadCount] = useState<number>(pushNotificationService.getUnreadCount());
+  const [currentRole, setCurrentRole] = useState<string>(jwtAuth.getCurrentUser()?.role || 'FLEET_ADMIN');
+  const [isTokenValid, setIsTokenValid] = useState<boolean>(true);
 
   useEffect(() => {
+    const unsubAuth = jwtAuth.subscribe(() => {
+      const decoded = jwtAuth.getDecoded();
+      if (decoded && decoded.isValidSignature && !decoded.isExpired) {
+        setCurrentRole(decoded.payload.role);
+        setIsTokenValid(true);
+      } else {
+        setIsTokenValid(false);
+      }
+    });
+
     const unsub = pushNotificationService.subscribeInbox(() => {
       setUnreadCount(pushNotificationService.getUnreadCount());
     });
-    return () => unsub();
+
+    return () => {
+      unsubAuth();
+      unsub();
+    };
   }, []);
 
   return (
@@ -111,7 +137,67 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Global Controls & Theme & Notifications */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center flex-wrap gap-2">
+          {/* Direct Google Maps & Device Location Tab Button */}
+          <button
+            onClick={() => setActiveTab('google_maps')}
+            className={`px-3 py-1.5 rounded-xl border text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-md cursor-pointer ${
+              activeTab === 'google_maps'
+                ? 'bg-orange-500 text-black border-orange-400 shadow-orange-500/20'
+                : 'hover:border-orange-500/50'
+            }`}
+            style={{
+              backgroundColor: activeTab === 'google_maps' ? undefined : theme.bgElevated,
+              borderColor: activeTab === 'google_maps' ? undefined : theme.borderSubtle,
+              color: activeTab === 'google_maps' ? undefined : theme.textPrimary,
+            }}
+            title="Open Google Maps & Live Device GPS Tracker"
+          >
+            <MapPin className={`w-3.5 h-3.5 ${activeTab === 'google_maps' ? 'text-black' : 'text-orange-400'}`} />
+            <span>Google Maps</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          </button>
+
+          {/* Quick Map Settings Modal Trigger */}
+          {onOpenMapsSettings && (
+            <button
+              onClick={onOpenMapsSettings}
+              className="p-2 rounded-xl border transition-all cursor-pointer hover:border-orange-500/50"
+              style={{
+                backgroundColor: theme.bgElevated,
+                borderColor: theme.borderSubtle,
+                color: theme.textSecondary,
+              }}
+              title="Configure Google Maps Platform Settings (Themes, 3D, Traffic)"
+            >
+              <Settings className="w-4 h-4 text-orange-400" />
+            </button>
+          )}
+
+          {/* JWT Security Badge / Modal Trigger */}
+          {onOpenJwtModal && (
+            <button
+              onClick={onOpenJwtModal}
+              className="px-2.5 py-1.5 rounded-xl border text-xs font-mono transition-all flex items-center gap-1.5 cursor-pointer hover:border-cyan-400"
+              style={{
+                backgroundColor: theme.bgElevated,
+                borderColor: isTokenValid ? 'rgba(6, 182, 212, 0.4)' : 'rgba(239, 68, 68, 0.5)',
+                color: isTokenValid ? '#22d3ee' : '#f87171',
+              }}
+              title="High-End JWT Authentication & RBAC Permissions"
+            >
+              {isTokenValid ? (
+                <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
+              ) : (
+                <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
+              )}
+              <span className="font-bold text-[11px] hidden sm:inline">{currentRole}</span>
+              <span className="text-[10px] opacity-75 hidden md:inline">
+                [{isTokenValid ? 'JWT OK' : 'EXPIRED'}]
+              </span>
+            </button>
+          )}
+
           {/* Quick Notification Button */}
           <button
             onClick={() => setActiveTab('notifications')}

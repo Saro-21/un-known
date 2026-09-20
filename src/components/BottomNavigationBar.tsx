@@ -12,12 +12,13 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { Home, Layers, Navigation, Smartphone, Download, Bell } from 'lucide-react';
+import { Home, Layers, Navigation, Smartphone, Download, Bell, MapPin } from 'lucide-react';
 import { useTheme } from '../theme/ThemeContext';
 import { pushNotificationService } from '../services/notificationService';
 
 export type MainNavTab =
   | 'home_architecture'
+  | 'google_maps'
   | 'phase1_2'
   | 'live_nav'
   | 'phone_cli'
@@ -72,6 +73,12 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
       id: 'home_architecture',
       label: 'Home (Architecture)',
       icon: Home,
+      badge: null,
+    },
+    {
+      id: 'google_maps',
+      label: 'Google Maps & GPS',
+      icon: MapPin,
       badge: null,
     },
     {

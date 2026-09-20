@@ -62,6 +62,10 @@ import {
   ProcessedFusionData,
 } from './core/trajectoryCache';
 import { OfflineIndicator } from './components/OfflineIndicator';
+import { GoogleMapsDeviceTracker } from './components/GoogleMapsDeviceTracker';
+import { GoogleMapsSettingsModal } from './components/GoogleMapsSettingsModal';
+import { JWTSecurityModal } from './components/JWTSecurityModal';
+import { GoogleMapsSettings, DEFAULT_GOOGLE_MAPS_SETTINGS } from './types/googleMapsSettings';
 
 function DrifXInnerApp() {
   const { theme } = useTheme();
@@ -72,6 +76,9 @@ function DrifXInnerApp() {
   const [manualTunnelStartStep, setManualTunnelStartStep] = useState<number | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [forceRecomputeCounter, setForceRecomputeCounter] = useState<number>(0);
+  const [googleMapsSettings, setGoogleMapsSettings] = useState<GoogleMapsSettings>(DEFAULT_GOOGLE_MAPS_SETTINGS);
+  const [isMapsSettingsOpen, setIsMapsSettingsOpen] = useState<boolean>(false);
+  const [isJwtModalOpen, setIsJwtModalOpen] = useState<boolean>(false);
   const [cacheStatus, setCacheStatus] = useState<{
     isCached: boolean;
     source: 'computed' | 'local_storage';
@@ -339,6 +346,8 @@ function DrifXInnerApp() {
           });
         }}
         currentHz={10.0}
+        onOpenMapsSettings={() => setIsMapsSettingsOpen(true)}
+        onOpenJwtModal={() => setIsJwtModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -438,6 +447,15 @@ function DrifXInnerApp() {
                 return next;
               });
             }}
+          />
+        )}
+
+        {/* GOOGLE MAPS & LIVE ACCURATE DEVICE GPS */}
+        {activeTab === 'google_maps' && (
+          <GoogleMapsDeviceTracker
+            settings={googleMapsSettings}
+            onOpenSettings={() => setIsMapsSettingsOpen(true)}
+            onOpenSecurityModal={() => setIsJwtModalOpen(true)}
           />
         )}
 
@@ -543,6 +561,22 @@ function DrifXInnerApp() {
 
       {/* Real-time PWA Offline & Connectivity Banner */}
       <OfflineIndicator />
+
+      {/* Google Maps Settings Modal */}
+      <GoogleMapsSettingsModal
+        isOpen={isMapsSettingsOpen}
+        onClose={() => setIsMapsSettingsOpen(false)}
+        settings={googleMapsSettings}
+        onUpdateSettings={(newVals) =>
+          setGoogleMapsSettings((prev) => ({ ...prev, ...newVals }))
+        }
+      />
+
+      {/* JWT Authentication & Permissions Modal */}
+      <JWTSecurityModal
+        isOpen={isJwtModalOpen}
+        onClose={() => setIsJwtModalOpen(false)}
+      />
     </div>
   );
 }

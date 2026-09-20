@@ -20,6 +20,7 @@ import {
   Activity,
   CheckCircle2,
   Clock,
+  MapPin,
 } from 'lucide-react';
 import { useTheme } from '../theme/ThemeContext';
 import { pushNotificationService } from '../services/notificationService';
@@ -172,6 +173,16 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
         {/* Quick Action Buttons on Hero */}
         <div className="flex flex-wrap gap-2.5 mt-6 pt-5 border-t" style={{ borderColor: theme.borderSubtle }}>
+          <button
+            onClick={() => navigateTo('google_maps')}
+            className="px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-md hover:scale-[1.02] cursor-pointer bg-gradient-to-r from-orange-500 to-amber-500 text-black border border-orange-400 font-mono"
+            title="Open Google Maps & Live Device GPS Tracker"
+          >
+            <MapPin className="w-3.5 h-3.5 text-black" />
+            <span>Google Maps &amp; GPS</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-950 animate-pulse" />
+          </button>
+
           <button
             onClick={() => navigateTo('live_nav')}
             className="px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-md hover:scale-[1.02] cursor-pointer"
