@@ -499,6 +499,7 @@ export const GoogleMapsDeviceTracker: React.FC<GoogleMapsDeviceTrackerProps> = (
       <div className="relative w-full h-[520px] rounded-2xl overflow-hidden border border-white/10 bg-[#080808] shadow-inner">
         <APIProvider apiKey={apiKey}>
           <Map
+            mapId={settings.mapId || 'DEMO_MAP_ID'}
             defaultCenter={defaultCenter}
             center={currentCenter}
             defaultZoom={17}

@@ -13,6 +13,7 @@ export type MapNavigationTheme =
   | 'retro_nav';
 
 export interface GoogleMapsSettings {
+  mapId?: string;
   mapType: GoogleMapType;
   theme: MapNavigationTheme;
   showTraffic: boolean;
@@ -31,6 +32,7 @@ export interface GoogleMapsSettings {
 }
 
 export const DEFAULT_GOOGLE_MAPS_SETTINGS: GoogleMapsSettings = {
+  mapId: (import.meta.env.VITE_GOOGLE_MAPS_MAP_ID as string) || 'DEMO_MAP_ID',
   mapType: 'roadmap',
   theme: 'dark_cyberpunk',
   showTraffic: true,

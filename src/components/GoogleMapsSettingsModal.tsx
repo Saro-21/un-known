@@ -311,6 +311,38 @@ export const GoogleMapsSettingsModal: React.FC<GoogleMapsSettingsModalProps> = (
             </div>
           </div>
 
+          {/* Section 6: Cloud Map ID for Advanced Markers */}
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between text-white font-bold font-mono">
+              <div className="flex items-center gap-2">
+                <Map className="w-4 h-4 text-cyan-400" />
+                <span>Google Maps Vector Map ID</span>
+              </div>
+              <span className="text-[10px] font-normal text-neutral-400 font-mono">Required for Advanced Markers</span>
+            </div>
+            <div className="p-3 rounded-xl bg-[#141820] border border-white/5 space-y-2">
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={settings.mapId || 'DEMO_MAP_ID'}
+                  onChange={(e) => onUpdateSettings({ mapId: e.target.value.trim() || 'DEMO_MAP_ID' })}
+                  placeholder="DEMO_MAP_ID or your Cloud Console Map ID"
+                  className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-cyan-400"
+                />
+                <button
+                  onClick={() => onUpdateSettings({ mapId: 'DEMO_MAP_ID' })}
+                  className="px-3 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-lg font-mono text-xs whitespace-nowrap cursor-pointer"
+                  title="Reset to default DEMO_MAP_ID"
+                >
+                  Reset Demo
+                </button>
+              </div>
+              <p className="text-[10px] text-neutral-400">
+                A valid Map ID activates the Vector Map renderer and AdvancedMarkerElement with sub-pixel device location precision. Defaults to <code className="text-cyan-300">DEMO_MAP_ID</code>.
+              </p>
+            </div>
+          </div>
+
           {/* Section 6: Compliance, Legal Terms & API Notice */}
           <div className="p-3.5 rounded-xl bg-[#090c10] border border-white/10 space-y-2 text-[11px] text-neutral-400">
             <div className="flex items-center justify-between text-neutral-300 font-mono text-xs">
